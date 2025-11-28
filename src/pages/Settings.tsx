@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +23,35 @@ export default function Settings() {
     name: "John Doe",
     email: "john@example.com",
   });
+  const [profileInitials, setProfileInitials] = useState("AB");
+  const [githubUsername, setGithubUsername] = useState("");
+
+  useEffect(() => {
+    // Get user data from localStorage
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        setProfile({
+          name: user.name || user.email?.split("@")[0] || "John Doe",
+          email: user.email || "john@example.com",
+        });
+        
+        // Set initials for avatar
+        const email = user.email || "";
+        const login = user.login || "";
+        const initials = login ? login.substring(0, 2).toUpperCase() : email.substring(0, 2).toUpperCase() || "AB";
+        setProfileInitials(initials);
+        
+        // Set GitHub username if available
+        if (user.login) {
+          setGithubUsername(user.login);
+        }
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+  }, []);
   const [notifications, setNotifications] = useState({
     deploySuccess: true,
     deployFailed: true,
@@ -77,7 +106,7 @@ export default function Settings() {
 
               <div className="flex items-center gap-6">
                 <div className="w-20 h-20 rounded-full gradient-hero flex items-center justify-center">
-                  <span className="text-2xl font-bold text-primary-foreground">AB</span>
+                  <span className="text-2xl font-bold text-primary-foreground">{profileInitials}</span>
                 </div>
               </div>
 
@@ -140,7 +169,7 @@ export default function Settings() {
                   <div>
                     <p className="font-medium">GitHub</p>
                     <p className="text-sm text-muted-foreground">
-                      {isGithubConnected ? "Connected as @johndoe" : "Not connected"}
+                      {isGithubConnected ? (githubUsername ? `Connected as @${githubUsername}` : "Connected") : "Not connected"}
                     </p>
                   </div>
                 </div>
