@@ -271,45 +271,12 @@ export default function Auth() {
 
       {/* Right Panel - Branding */}
       <div className="hidden lg:flex flex-1 gradient-hero items-center justify-center p-12">
-        <div className="max-w-md text-primary-foreground">
-          <h2 className="text-3xl font-bold mb-6">
-            Deploy your projects like a pro
-          </h2>
-          <ul className="space-y-4">
-            <li className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-primary-foreground/20 flex items-center justify-center shrink-0 mt-0.5">
-                <span className="text-sm font-medium">1</span>
-              </div>
-              <div>
-                <p className="font-medium">Import your code</p>
-                <p className="text-sm opacity-80">
-                  From GitHub or upload directly
-                </p>
-              </div>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-primary-foreground/20 flex items-center justify-center shrink-0 mt-0.5">
-                <span className="text-sm font-medium">2</span>
-              </div>
-              <div>
-                <p className="font-medium">Auto-configure</p>
-                <p className="text-sm opacity-80">
-                  We handle all the DevOps magic
-                </p>
-              </div>
-            </li>
-            <li className="flex items-start gap-3">
-              <div className="w-6 h-6 rounded-full bg-primary-foreground/20 flex items-center justify-center shrink-0 mt-0.5">
-                <span className="text-sm font-medium">3</span>
-              </div>
-              <div>
-                <p className="font-medium">Go live instantly</p>
-                <p className="text-sm opacity-80">
-                  Get a shareable URL in seconds
-                </p>
-              </div>
-            </li>
-          </ul>
+        <div className="max-w-lg">
+          <img 
+            src="/src/assets/undraw_exam-prep_nmly.svg" 
+            alt="Exam preparation illustration" 
+            className="w-full h-auto"
+          />
         </div>
       </div>
     </div>

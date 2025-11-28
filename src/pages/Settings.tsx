@@ -305,7 +305,7 @@ export default function Settings() {
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">
-                  You're currently on the free plan with 3 projects and 100 deployments/month.
+                  You're currently on the free plan with 15 projects and 15 deployments/month.
                 </p>
                 <Button variant="hero">Upgrade to Pro</Button>
               </div>
@@ -314,11 +314,11 @@ export default function Settings() {
                 <h3 className="font-semibold">Usage This Month</h3>
                 <div className="grid md:grid-cols-3 gap-4">
                   <div className="p-4 rounded-lg bg-secondary/50">
-                    <p className="text-2xl font-bold">0/3</p>
+                    <p className="text-2xl font-bold">0/15</p>
                     <p className="text-sm text-muted-foreground">Projects</p>
                   </div>
                   <div className="p-4 rounded-lg bg-secondary/50">
-                    <p className="text-2xl font-bold">0/100</p>
+                    <p className="text-2xl font-bold">0/15</p>
                     <p className="text-sm text-muted-foreground">Deployments</p>
                   </div>
                   <div className="p-4 rounded-lg bg-secondary/50">
