@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,6 +37,24 @@ export default function Portfolio() {
     selectedProjects: ["1", "2", "4"],
   });
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Get user data from localStorage
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        setPortfolioData((prev) => ({
+          ...prev,
+          name: user.name || user.email?.split("@")[0] || prev.name,
+          email: user.email || prev.email,
+          github: user.login || user.github || prev.github,
+        }));
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+  }, []);
 
   const portfolioUrl = "abhi.OneShip.app";
 

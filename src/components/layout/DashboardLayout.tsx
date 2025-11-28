@@ -14,7 +14,7 @@ import {
   Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const sidebarLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -31,10 +31,34 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const [userInitials, setUserInitials] = useState("JD");
   const location = useLocation();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Get user data from localStorage
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        // For GitHub users, use login (username), otherwise use email
+        const login = user.login || "";
+        const email = user.email || "";
+        // Get first two letters - prefer login for GitHub, otherwise email
+        const source = login || email;
+        const initials = source.substring(0, 2).toUpperCase() || "JD";
+        setUserInitials(initials);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+  }, []);
+
   const handleLogout = () => {
+    // Clear user data from localStorage
+    localStorage.removeItem("user");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("authProvider");
     navigate("/");
   };
 
@@ -120,7 +144,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 <Bell className="h-5 w-5" />
               </Button>
               <div className="w-8 h-8 rounded-full gradient-hero flex items-center justify-center">
-                <span className="text-sm font-medium text-primary-foreground">JD</span>
+                <span className="text-sm font-medium text-primary-foreground">{userInitials}</span>
               </div>
             </div>
           </div>

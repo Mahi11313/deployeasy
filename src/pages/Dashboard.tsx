@@ -13,6 +13,7 @@ import {
   Shield,
   Zap,
 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const recentProjects = [
   
@@ -32,6 +33,23 @@ const tips = [
 ];
 
 export default function Dashboard() {
+  const [userName, setUserName] = useState("Abhi");
+
+  useEffect(() => {
+    // Get user data from localStorage
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        // Use name if available, otherwise use email, otherwise default to "Abhi"
+        const name = user.name || user.email?.split("@")[0] || "Abhi";
+        setUserName(name);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+  }, []);
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "live":
@@ -60,7 +78,7 @@ export default function Dashboard() {
         {/* Welcome Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-1">Welcome back, Abhi! 👋</h1>
+            <h1 className="text-3xl font-bold mb-1">Welcome back, {userName}! 👋</h1>
             <p className="text-muted-foreground">
               Here's what's happening with your projects today.
             </p>
