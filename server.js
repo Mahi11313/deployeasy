@@ -1,12 +1,24 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import simpleGit from "simple-git";
+import fs from "fs-extra";
+import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 // Load environment variables
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const app = express();
 const PORT = process.env.BACKEND_PORT || 3001;
+
+// In-memory storage for analysis results (in production, use a real database)
+const analysisStorage = new Map();
 
 // Verify required environment variables at startup
 const clientId = process.env.VITE_GITHUB_CLIENT_ID;
@@ -181,11 +193,244 @@ async function handleGitHubTokenExchange(code, res) {
   }
 }
 
+// Repository Analysis Functions
+async function generateRepoMetadata(projectPath) {
+  const metadata = {
+    packageJson: null,
+    dockerfile: null,
+    envFile: null,
+    readme: null,
+    fileTree: ""
+  };
+
+  try {
+    // Read package.json
+    const packageJsonPath = path.join(projectPath, "package.json");
+    if (await fs.pathExists(packageJsonPath)) {
+      metadata.packageJson = await fs.readFile(packageJsonPath, "utf8");
+    }
+
+    // Read Dockerfile
+    const dockerfilePath = path.join(projectPath, "Dockerfile");
+    if (await fs.pathExists(dockerfilePath)) {
+      metadata.dockerfile = await fs.readFile(dockerfilePath, "utf8");
+    }
+
+    // Read .env or .env.example
+    const envPaths = [".env", ".env.example", ".env.local"];
+    for (const envPath of envPaths) {
+      const fullEnvPath = path.join(projectPath, envPath);
+      if (await fs.pathExists(fullEnvPath)) {
+        metadata.envFile = await fs.readFile(fullEnvPath, "utf8");
+        break;
+      }
+    }
+
+    // Read README.md
+    const readmePaths = ["README.md", "readme.md", "README.txt"];
+    for (const readmePath of readmePaths) {
+      const fullReadmePath = path.join(projectPath, readmePath);
+      if (await fs.pathExists(fullReadmePath)) {
+        metadata.readme = await fs.readFile(fullReadmePath, "utf8");
+        break;
+      }
+    }
+
+    // Generate file tree
+    metadata.fileTree = await generateFileTree(projectPath);
+
+    // Also check for other common files
+    const otherFiles = ["requirements.txt", "pyproject.toml", "composer.json", "Procfile", "go.mod", "Cargo.toml"];
+    for (const file of otherFiles) {
+      const filePath = path.join(projectPath, file);
+      if (await fs.pathExists(filePath)) {
+        const content = await fs.readFile(filePath, "utf8");
+        metadata[file.replace(".", "_")] = content;
+      }
+    }
+
+  } catch (error) {
+    console.error("Error generating repo metadata:", error);
+  }
+
+  return metadata;
+}
+
+async function generateFileTree(dirPath, prefix = "", maxDepth = 3, currentDepth = 0) {
+  if (currentDepth >= maxDepth) return "";
+  
+  let tree = "";
+  try {
+    const items = await fs.readdir(dirPath);
+    const filteredItems = items.filter(item => 
+      !item.startsWith('.') || 
+      ['.env', '.env.example', '.gitignore'].includes(item)
+    ).slice(0, 20); // Limit items to prevent huge trees
+
+    for (let i = 0; i < filteredItems.length; i++) {
+      const item = filteredItems[i];
+      const itemPath = path.join(dirPath, item);
+      const isLast = i === filteredItems.length - 1;
+      const currentPrefix = isLast ? "└── " : "├── ";
+      
+      try {
+        const stats = await fs.stat(itemPath);
+        tree += `${prefix}${currentPrefix}${item}\n`;
+        
+        if (stats.isDirectory() && currentDepth < maxDepth - 1) {
+          const nextPrefix = prefix + (isLast ? "    " : "│   ");
+          tree += await generateFileTree(itemPath, nextPrefix, maxDepth, currentDepth + 1);
+        }
+      } catch (err) {
+        // Skip items that can't be accessed
+        continue;
+      }
+    }
+  } catch (error) {
+    console.error("Error reading directory:", error);
+  }
+  
+  return tree;
+}
+
+async function analyzeWithGemini(metadata) {
+  const geminiApiKey = process.env.GEMINI_API_KEY;
+  
+  if (!geminiApiKey) {
+    throw new Error("GEMINI_API_KEY environment variable is required");
+  }
+
+  const genAI = new GoogleGenerativeAI(geminiApiKey);
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+  const prompt = `You are a deployment analysis engine. Return JSON only.
+
+Repository metadata:
+PACKAGE_JSON: ${metadata.packageJson || "none"}
+DOCKERFILE: ${metadata.dockerfile || "none"}
+ENV_FILE: ${metadata.envFile || "none"}
+README: ${metadata.readme || "none"}
+FILE_TREE: ${metadata.fileTree || "none"}
+
+Extract and respond in JSON with:
+- stack
+- framework
+- buildCommand
+- startCommand
+- requiredEnv
+- recommendedEnvTemplate
+- deploymentType
+- notes`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    // Clean up the response to extract JSON
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("No valid JSON found in Gemini response");
+    }
+    
+    return JSON.parse(jsonMatch[0]);
+  } catch (error) {
+    console.error("Error analyzing with Gemini:", error);
+    throw error;
+  }
+}
+
+// Repository Analysis Endpoints
+app.post("/api/analyze-repo", async (req, res) => {
+  try {
+    const { repoUrl } = req.body;
+    
+    if (!repoUrl) {
+      return res.status(400).json({ error: "Repository URL is required" });
+    }
+
+    // Validate GitHub URL
+    const githubUrlPattern = /^https:\/\/github\.com\/[\w\-\.]+\/[\w\-\.]+\/?$/;
+    if (!githubUrlPattern.test(repoUrl)) {
+      return res.status(400).json({ error: "Invalid GitHub repository URL" });
+    }
+
+    console.log("🔍 Starting repository analysis for:", repoUrl);
+
+    // Create temporary directory
+    const tempDir = path.join(__dirname, "temp", `repo-${Date.now()}`);
+    await fs.ensureDir(tempDir);
+
+    try {
+      // Clone repository
+      console.log("📥 Cloning repository...");
+      const git = simpleGit();
+      await git.clone(repoUrl, tempDir, ["--depth", "1"]);
+
+      // Generate metadata
+      console.log("📊 Generating metadata...");
+      const metadata = await generateRepoMetadata(tempDir);
+
+      // Analyze with Gemini
+      console.log("🤖 Analyzing with Gemini...");
+      const analysis = await analyzeWithGemini(metadata);
+
+      // Store analysis result
+      const repoId = repoUrl.replace("https://github.com/", "").replace("/", "-");
+      analysisStorage.set(repoId, {
+        ...analysis,
+        repoUrl,
+        analyzedAt: new Date().toISOString()
+      });
+
+      console.log("✅ Analysis completed successfully");
+
+      res.json({
+        success: true,
+        repoId,
+        analysis
+      });
+
+    } finally {
+      // Clean up temporary directory
+      try {
+        await fs.remove(tempDir);
+      } catch (cleanupError) {
+        console.error("Warning: Failed to clean up temp directory:", cleanupError);
+      }
+    }
+
+  } catch (error) {
+    console.error("❌ Error analyzing repository:", error);
+    res.status(500).json({ 
+      error: "Analysis failed", 
+      message: error.message 
+    });
+  }
+});
+
+app.get("/api/analysis/:repoId", (req, res) => {
+  try {
+    const { repoId } = req.params;
+    const analysis = analysisStorage.get(repoId);
+    
+    if (!analysis) {
+      return res.status(404).json({ error: "Analysis not found" });
+    }
+    
+    res.json(analysis);
+  } catch (error) {
+    console.error("❌ Error fetching analysis:", error);
+    res.status(500).json({ error: "Failed to fetch analysis" });
+  }
+});
+
 // Health check endpoint
 app.get("/health", (req, res) => {
   res.json({ 
     status: "ok",
     timestamp: new Date().toISOString(),
+    geminiConfigured: !!process.env.GEMINI_API_KEY
   });
 });
 
@@ -193,6 +438,7 @@ app.listen(PORT, () => {
   console.log("\n🚀 Backend server started");
   console.log(`   URL: http://localhost:${PORT}`);
   console.log(`   GitHub OAuth endpoint: http://localhost:${PORT}/oauth/github`);
+  console.log(`   Repository analysis endpoint: http://localhost:${PORT}/api/analyze-repo`);
   console.log(`   Health check: http://localhost:${PORT}/health\n`);
 });
 

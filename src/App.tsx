@@ -20,6 +20,7 @@ import Templates from "./pages/Templates";
 import AppTemplates from "./pages/AppTemplates";
 import Docs from "./pages/Docs";
 import Pricing from "./pages/Pricing";
+import RepoAnalysis from "./pages/RepoAnalysis";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => {
               <Route path="/templates" element={<Templates />} />
               <Route path="/docs" element={<Docs />} />
               <Route path="/pricing" element={<Pricing />} />
+              <Route path="/analyze" element={<RepoAnalysis />} />
               
               {/* App Pages (after login) - Protected Routes */}
               <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

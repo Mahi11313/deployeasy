@@ -1,54 +1,53 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { Navbar } from "@/components/layout/Navbar";
+import LogoLoop from "@/components/ui/LogoLoop";
+import FlowingMenu from "@/components/ui/FlowingMenu";
 import {
-  Rocket,
-  Zap,
-  Shield,
-  Globe,
   Github,
   FileArchive,
   Code2,
   ArrowRight,
-  Check,
-  Terminal,
-  Lock,
-  BarChart3,
 } from "lucide-react";
-import heroBg from "@/assets/hero-bg.jpg";
+import { 
+  SiReact, 
+  SiNextdotjs, 
+  SiVuedotjs, 
+  SiAngular, 
+  SiDjango, 
+  SiFlask, 
+  SiNodedotjs, 
+  SiExpress, 
+  SiFastapi, 
+  SiSvelte, 
+  SiNuxtdotjs, 
+  SiLaravel, 
+  SiSpring, 
+  SiRubyonrails 
+} from 'react-icons/si';
 
 const features = [
   {
-    icon: Zap,
-    title: "One-Click Deploy",
-    description: "Deploy your project in seconds. No DevOps knowledge required.",
+    link: '#',
+    text: 'Real-Time Build Logs',
+    image: 'https://picsum.photos/600/400?random=1'
   },
   {
-    icon: Code2,
-    title: "Auto-Detect Framework",
-    description: "We automatically detect React, Next.js, Django, Flask, Node.js, and more.",
+    link: '#',
+    text: 'Portfolio Generator',
+    image: 'https://picsum.photos/600/400?random=2'
   },
   {
-    icon: Shield,
-    title: "Security Scanning",
-    description: "Automatic vulnerability scanning before every deployment.",
+    link: '#',
+    text: 'Auto-Detect Framework',
+    image: 'https://picsum.photos/600/400?random=3'
   },
   {
-    icon: Globe,
-    title: "Instant Live URL",
-    description: "Get a shareable live URL for your project immediately.",
-  },
-  {
-    icon: Terminal,
-    title: "Real-Time Build Logs",
-    description: "Watch your deployment progress with detailed, beginner-friendly logs.",
-  },
-  {
-    icon: BarChart3,
-    title: "Portfolio Generator",
-    description: "Create a professional portfolio page showcasing all your projects.",
-  },
+    link: '#',
+    text: 'Security Scanning',
+    image: 'https://picsum.photos/600/400?random=4'
+  }
 ];
 
 const steps = [
@@ -74,8 +73,21 @@ const steps = [
   },
 ];
 
-const frameworks = [
-  "React", "Next.js", "Vue", "Angular", "Django", "Flask", "Node.js", "Express", "FastAPI"
+const techLogos = [
+  { node: <SiReact />, title: "React", href: "https://react.dev" },
+  { node: <SiNextdotjs />, title: "Next.js", href: "https://nextjs.org" },
+  { node: <SiVuedotjs />, title: "Vue.js", href: "https://vuejs.org" },
+  { node: <SiAngular />, title: "Angular", href: "https://angular.io" },
+  { node: <SiDjango />, title: "Django", href: "https://djangoproject.com" },
+  { node: <SiFlask />, title: "Flask", href: "https://flask.palletsprojects.com" },
+  { node: <SiNodedotjs />, title: "Node.js", href: "https://nodejs.org" },
+  { node: <SiExpress />, title: "Express", href: "https://expressjs.com" },
+  { node: <SiFastapi />, title: "FastAPI", href: "https://fastapi.tiangolo.com" },
+  { node: <SiSvelte />, title: "Svelte", href: "https://svelte.dev" },
+  { node: <SiNuxtdotjs />, title: "Nuxt.js", href: "https://nuxt.com" },
+  { node: <SiLaravel />, title: "Laravel", href: "https://laravel.com" },
+  { node: <SiSpring />, title: "Spring Boot", href: "https://spring.io" },
+  { node: <SiRubyonrails />, title: "Ruby on Rails", href: "https://rubyonrails.org" },
 ];
 
 export default function Index() {
@@ -84,59 +96,49 @@ export default function Index() {
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative pt-24 pb-20 overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: `url(${heroBg})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/90 to-background" />
+      <section className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white overflow-hidden pt-32">
         
-        <div className="container mx-auto px-4 relative">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-8 animate-fade-in">
-              <Rocket className="h-4 w-4" />
-              <span className="text-sm font-medium">Built for students, by students</span>
-            </div>
-            
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-              Ship Your Projects<br />
-              <span className="gradient-text">In One Click</span>
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="max-w-5xl mx-auto text-center">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl mb-16 leading-tight animate-fade-in" style={{ 
+              fontFamily: 'Inter, sans-serif',
+              fontWeight: '300',
+              letterSpacing: '-0.04em'
+            }}>
+              <span className="block text-gray-900">Ship Your Projects</span>
+              <span className="block text-black font-semibold italic" style={{ fontWeight: '600' }}>In One Click</span>
             </h1>
             
-            <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "0.2s" }}>
-              Stop wrestling with Docker, CI/CD, and server configs. Deploy your hackathon projects, class assignments, and side projects instantly.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.3s" }}>
+            {/* Centered Deploy Button */}
+            <div className="flex justify-center mt-12 animate-slide-up" style={{ animationDelay: "0.3s" }}>
               <Link to="/auth?mode=signup">
-                <Button variant="hero" size="xl">
-                  Start Deploying Free
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link to="/how-it-works">
-                <Button variant="outline" size="xl">
-                  See How It Works
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 transform">
+                  DEPLOY NOW!
                 </Button>
               </Link>
             </div>
-
-            <div className="mt-12 flex flex-wrap items-center justify-center gap-4 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: "0.4s" }}>
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-success" />
-                <span>No credit card required</span>
+            
+            {/* Stats Section */}
+            <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 mt-16 animate-slide-up" style={{ animationDelay: "0.5s" }}>
+              <div className="flex items-center gap-4 hover:scale-105 transition-transform duration-300">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-black">5+</div>
+                  <div className="text-sm text-gray-600">Years of Excellence</div>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-success" />
-                <span>Free tier forever</span>
+              
+              <div className="flex items-center gap-4 hover:scale-105 transition-transform duration-300">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-black">99%</div>
+                  <div className="text-sm text-gray-600">Success Rate</div>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Check className="h-4 w-4 text-success" />
-                <span>Deploy in under 60 seconds</span>
+              
+              <div className="flex items-center gap-4 hover:scale-105 transition-transform duration-300">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-black">1000+</div>
+                  <div className="text-sm text-gray-600">Projects Deployed</div>
+                </div>
               </div>
             </div>
           </div>
@@ -144,50 +146,95 @@ export default function Index() {
       </section>
 
       {/* Frameworks */}
-      <section className="py-12 border-y bg-secondary/30">
+      <section className="py-20 bg-black overflow-hidden">
         <div className="container mx-auto px-4">
-          <p className="text-center text-sm text-muted-foreground mb-6">
+          <p className="text-center text-lg text-gray-300 mb-12 font-semibold">
             Supports all your favorite frameworks
           </p>
-          <div className="flex flex-wrap justify-center gap-8">
-            {frameworks.map((fw) => (
-              <span key={fw} className="text-lg font-medium text-muted-foreground hover:text-foreground transition-colors">
-                {fw}
-              </span>
-            ))}
-          </div>
+          
+          <LogoLoop
+            logos={techLogos}
+            speed={120}
+            direction="left"
+            logoHeight={48}
+            gap={60}
+            hoverSpeed={20}
+            scaleOnHover
+            fadeOut
+            fadeOutColor="#000000"
+            ariaLabel="Supported technology frameworks"
+            className="text-gray-400 hover:text-blue-400"
+          />
         </div>
       </section>
 
       {/* Features */}
-      <section className="py-24">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-black">
               Everything You Need to Ship Fast
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               We handle the complex DevOps so you can focus on building amazing projects.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <div
-                  key={feature.title}
-                  className="group p-6 rounded-xl border bg-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="w-12 h-12 rounded-lg gradient-hero flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Icon className="h-6 w-6 text-primary-foreground" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
+          <div style={{ height: '600px', position: 'relative' }}>
+            <FlowingMenu items={features} />
+          </div>
+        </div>
+      </section>
+
+      {/* AI Analysis Section */}
+      <section className="py-24 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-semibold mb-6">
+              <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span>
+              Powered by Gemini AI
+            </div>
+            
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
+              Instant Repository Analysis
+            </h2>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+              Drop any GitHub repository URL and get instant AI-powered analysis of technology stack, 
+              build commands, environment variables, and deployment requirements.
+            </p>
+            
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-white p-6 rounded-xl shadow-sm border">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                  <Code2 className="h-6 w-6 text-blue-600" />
                 </div>
-              );
-            })}
+                <h3 className="font-semibold mb-2">Tech Stack Detection</h3>
+                <p className="text-sm text-gray-600">Automatically identify frameworks, languages, and dependencies</p>
+              </div>
+              
+              <div className="bg-white p-6 rounded-xl shadow-sm border">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                  <FileArchive className="h-6 w-6 text-purple-600" />
+                </div>
+                <h3 className="font-semibold mb-2">Build Commands</h3>
+                <p className="text-sm text-gray-600">Get the exact build and start commands for your project</p>
+              </div>
+              
+              <div className="bg-white p-6 rounded-xl shadow-sm border">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                  <Github className="h-6 w-6 text-green-600" />
+                </div>
+                <h3 className="font-semibold mb-2">Environment Setup</h3>
+                <p className="text-sm text-gray-600">Discover required environment variables and configurations</p>
+              </div>
+            </div>
+            
+            <Link to="/analyze">
+              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                Try AI Analysis Free
+                <ArrowRight className="h-5 w-5 ml-2" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -278,7 +325,7 @@ export default function Index() {
                   <div className="w-3 h-3 rounded-full bg-success" />
                 </div>
                 <div className="font-mono text-sm space-y-2">
-                  <p className="text-muted-foreground">$ deployeasy deploy</p>
+                  <p className="text-muted-foreground">$ oneship deploy</p>
                   <p className="text-accent">→ Detected: React + Vite</p>
                   <p className="text-muted-foreground">→ Installing dependencies...</p>
                   <p className="text-muted-foreground">→ Running security scan...</p>
@@ -287,7 +334,7 @@ export default function Index() {
                   <p className="text-success">✓ Build successful</p>
                   <p className="text-muted-foreground">→ Deploying to edge network...</p>
                   <p className="text-success">✓ Deployed!</p>
-                  <p className="text-primary mt-4">🚀 Live at: https://my-project.deployeasy.app</p>
+                  <p className="text-primary mt-4">🚀 Live at: https://my-project.oneship.app</p>
                 </div>
               </div>
             </div>
@@ -303,7 +350,7 @@ export default function Index() {
               Ready to Ship Your Next Project?
             </h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Join thousands of students who are deploying their projects with DeployEasy.
+              Join thousands of developers who are deploying their projects with OneShip.
             </p>
             <Link to="/auth?mode=signup">
               <Button variant="hero" size="xl">
